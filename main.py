@@ -39,6 +39,18 @@ for row in range(4):
 
 run = True
 while run:
+    if 0 not in board[0] and 0 not in board[1] and 0 not in board[2] and 0 not in board[3]:
+        if game_over(board):
+            over = font.render("GAME OVER", False, (0, 0, 0))
+            win.blit(over, (300, 400))
+            pygame.display.update()
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run = False
+                        pygame.quit()
+                        break
+
     pygame.time.delay(50)
     score = font.render("Score: " + str(sum(board[0]) + sum(board[1]) + sum(board[2]) + sum(board[3])), False, (0, 0, 0))
     pygame.draw.rect(win, (255, 255, 255), (0, 0, 698, 50))
@@ -47,9 +59,11 @@ while run:
     pygame.display.update()
     pygame.event.wait()
 
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+            pygame.quit()
             break
     if keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
         if keys[pygame.K_UP]:
@@ -105,3 +119,4 @@ while run:
                 win.blit(text, (12 * row + row * 162 + 12 + 50, 12 * col + col * 162 + 12 + 50 + 90))
 
 pygame.quit()
+
