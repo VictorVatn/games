@@ -4,6 +4,7 @@ import random
 pygame.init()
 
 img = pygame.image.load('snakehead.png')
+apple_img = pygame.image.load('apple.png')
 
 FPS = 10
 
@@ -72,38 +73,36 @@ def game_intro():
 
     intro = True
 
+    gameDisplay.fill(white)
+    message_to_screen("Welcome to Slither", green, 100, "large")
+
+    message_to_screen("Try to grow as long as possible by eating the apples", black, 30)
+
+    message_to_screen("Watch out for your tail and the edges", black)
+
+    message_to_screen("Press Space to play or Q to quit", black, -50)
+
+    pygame.display.update()
+
     while intro:
-        gameDisplay.fill(white)
-        message_to_screen("Welcome to Slither", green, 100, "large")
-
-        message_to_screen("Try to grow as long as possible by eating the apples", black, 30)
-
-        message_to_screen("Watch out for your tail and the edges", black)
-
-        message_to_screen("Press Space to play or Q to quit", black, -50)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                intro = False
-                return True
+                pygame.quit()
+                quit()
 
             if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_q:
-                    intro = False
-                    return True
+                    pygame.quit()
+                    quit()
 
                 if event.key == pygame.K_SPACE:
                     intro = False
-                    return False
-
-        pygame.display.update()
 
         clock.tick(15)
 
 
 def game_loop():
-
     global actions_per_frame
 
     lead_x = display_width // 2
@@ -119,7 +118,7 @@ def game_loop():
     snake_list = []
     snake_length = 3
 
-    game_exit = game_intro()
+    game_exit = False
     game_over = False
 
     while not game_exit:
@@ -127,7 +126,7 @@ def game_loop():
         while game_over:
 
             gameDisplay.fill(black)
-            pygame.draw.rect(gameDisplay, red, [apple_x, apple_y, BLOCK_SIZE, BLOCK_SIZE])
+            gameDisplay.blit(apple_img, (apple_x, apple_y))
             snake(BLOCK_SIZE, snake_list, direction)
             message_to_screen("Game over", red, 50, "large")
 
@@ -191,7 +190,7 @@ def game_loop():
             continue
 
         gameDisplay.fill(black)
-        pygame.draw.rect(gameDisplay, red, [apple_x, apple_y, BLOCK_SIZE, BLOCK_SIZE])
+        gameDisplay.blit(apple_img, (apple_x, apple_y))
 
         snake_head = [lead_x, lead_y]
         snake_list.append(snake_head)
@@ -200,6 +199,8 @@ def game_loop():
             if segment == snake_head:
                 lead_x -= lead_x_change
                 lead_y -= lead_y_change
+                message_to_screen('You crashed into yourself', red)
+                pygame.display.update()
                 game_over = True
                 continue
 
@@ -223,4 +224,3 @@ def game_loop():
 
 game_intro()
 game_loop()
-
