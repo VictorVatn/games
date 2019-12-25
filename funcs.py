@@ -76,7 +76,6 @@ def game_over(board):
         test_board = []
         for i in range(4):
             test_board.append(board[i])
-        print(test_board)
         if k == 0:
             if down(test_board) == board:
                 a += 1
