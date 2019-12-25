@@ -1,10 +1,11 @@
 import pygame
 import random
+
 pygame.init()
 
 img = pygame.image.load('snakehead.png')
 
-FPS = 15
+FPS = 10
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -67,7 +68,42 @@ def snake(block_size, snake_list, direction):
     gameDisplay.blit(head, (snake_list[-1][0], snake_list[-1][1]))
 
 
+def game_intro():
+
+    intro = True
+
+    while intro:
+        gameDisplay.fill(white)
+        message_to_screen("Welcome to Slither", green, 100, "large")
+
+        message_to_screen("Try to grow as long as possible by eating the apples", black, 30)
+
+        message_to_screen("Watch out for your tail and the edges", black)
+
+        message_to_screen("Press Space to play or Q to quit", black, -50)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                intro = False
+                return True
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key == pygame.K_q:
+                    intro = False
+                    return True
+
+                if event.key == pygame.K_SPACE:
+                    intro = False
+                    return False
+
+        pygame.display.update()
+
+        clock.tick(15)
+
+
 def game_loop():
+
     global actions_per_frame
 
     lead_x = display_width // 2
@@ -81,15 +117,17 @@ def game_loop():
     apple_y = random.randrange(0, display_height - BLOCK_SIZE + 1, 20)
 
     snake_list = []
-    snake_length = 1
+    snake_length = 3
 
-    game_exit = False
+    game_exit = game_intro()
     game_over = False
+
     while not game_exit:
 
         while game_over:
 
             gameDisplay.fill(black)
+            pygame.draw.rect(gameDisplay, red, [apple_x, apple_y, BLOCK_SIZE, BLOCK_SIZE])
             snake(BLOCK_SIZE, snake_list, direction)
             message_to_screen("Game over", red, 50, "large")
 
@@ -162,8 +200,6 @@ def game_loop():
             if segment == snake_head:
                 lead_x -= lead_x_change
                 lead_y -= lead_y_change
-                message_to_screen('You crashed into yourself', red)
-                pygame.display.update()
                 game_over = True
                 continue
 
@@ -185,4 +221,6 @@ def game_loop():
     quit()
 
 
+game_intro()
 game_loop()
+
