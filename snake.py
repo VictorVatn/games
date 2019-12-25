@@ -9,8 +9,7 @@ black = (0, 0, 0)
 red = (255, 0, 0)
 green = (0, 150, 0)
 
-block_size = 10
-apple_thickness = 10
+BLOCK_SIZE = 10
 
 display_width = 800
 display_height = 600
@@ -41,10 +40,10 @@ def game_loop():
     lead_y = display_height // 2
 
     lead_x_change = 0
-    lead_y_change = -block_size
+    lead_y_change = -BLOCK_SIZE
 
-    apple_x = round(random.randint(0, display_width - block_size) / 10) * 10
-    apple_y = round(random.randint(0, display_height - block_size) / 10) * 10
+    apple_x = round(random.randint(0, display_width - BLOCK_SIZE) / 10) * 10
+    apple_y = round(random.randint(0, display_height - BLOCK_SIZE) / 10) * 10
 
     snake_list = []
     snake_length = 1
@@ -56,7 +55,7 @@ def game_loop():
         while game_over:
 
             gameDisplay.fill(black)
-            pygame.draw.rect(gameDisplay, green, [lead_x, lead_y, block_size, block_size])
+            pygame.draw.rect(gameDisplay, green, [lead_x, lead_y, BLOCK_SIZE, BLOCK_SIZE])
             message_to_screen("Game over, press C to play again or Q to quit", white)
 
             for event in pygame.event.get():
@@ -80,25 +79,25 @@ def game_loop():
             if event.type == pygame.KEYDOWN and actions_per_frame == 0:
                 if event.key == pygame.K_LEFT:
                     if lead_x_change == 0:
-                        lead_x_change = -block_size
+                        lead_x_change = -BLOCK_SIZE
                         lead_y_change = 0
                         actions_per_frame += 1
 
                 elif event.key == pygame.K_RIGHT:
                     if lead_x_change == 0:
-                        lead_x_change = block_size
+                        lead_x_change = BLOCK_SIZE
                         lead_y_change = 0
                         actions_per_frame += 1
 
                 elif event.key == pygame.K_UP:
                     if lead_y_change == 0:
-                        lead_y_change = -block_size
+                        lead_y_change = -BLOCK_SIZE
                         lead_x_change = 0
                         actions_per_frame += 1
 
                 elif event.key == pygame.K_DOWN:
                     if lead_y_change == 0:
-                        lead_y_change = block_size
+                        lead_y_change = BLOCK_SIZE
                         lead_x_change = 0
                         actions_per_frame += 1
 
@@ -112,7 +111,7 @@ def game_loop():
             continue
 
         gameDisplay.fill(black)
-        pygame.draw.rect(gameDisplay, red, [apple_x, apple_y, apple_thickness, apple_thickness])
+        pygame.draw.rect(gameDisplay, red, [apple_x, apple_y, BLOCK_SIZE, BLOCK_SIZE])
 
         snake_head = [lead_x, lead_y]
         snake_list.append(snake_head)
@@ -128,18 +127,12 @@ def game_loop():
         if len(snake_list) > snake_length:
             del snake_list[0]
 
-        snake(block_size, snake_list)
+        snake(BLOCK_SIZE, snake_list)
 
-#        if apple_x <= lead_x < apple_x + apple_thickness and apple_y <= lead_y < apple_y + apple_thickness:
-#            apple_x = round(random.randint(0, display_width - apple_thickness) / 10) * 10
-#            apple_y = round(random.randint(0, display_height - apple_thickness) / 10) * 10
-#            snake_length += 1
-
-        if apple_x <= lead_x < apple_x + apple_thickness or apple_x <= lead_x + block_size < apple_x + apple_thickness:
-            if apple_y <= lead_y < apple_y + apple_thickness or apple_y <= lead_y + block_size < apple_y + apple_thickness:
-                apple_x = round(random.randint(0, display_width - apple_thickness) / 10) * 10
-                apple_y = round(random.randint(0, display_height - apple_thickness) / 10) * 10
-                snake_length += 1
+        if apple_x <= lead_x < apple_x + BLOCK_SIZE and apple_y <= lead_y < apple_y + BLOCK_SIZE:
+            apple_x = round(random.randint(0, display_width - BLOCK_SIZE) / 10) * 10
+            apple_y = round(random.randint(0, display_height - BLOCK_SIZE) / 10) * 10
+            snake_length += 1
 
         pygame.display.update()
 
