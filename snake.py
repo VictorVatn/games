@@ -15,8 +15,8 @@ green = (0, 150, 0)
 
 BLOCK_SIZE = 20
 
-display_width = 800
-display_height = 600
+display_width = 1000
+display_height = 800
 
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Slither')
@@ -42,10 +42,36 @@ def text_objects(text, color, size):
 
 def message_to_screen(message, color, y_displace=0, size="small"):
     textSurf, textRect = text_objects(message, color, size)
-    # screen_text = font.render(message, True, color)
-    # gameDisplay.blit(screen_text, [display_width // 2, display_height // 2])
     textRect.center = display_width // 2, display_height // 2 - y_displace
     gameDisplay.blit(textSurf, textRect)
+
+
+def pause():
+
+    message_to_screen('Paused', white, 100, 'large')
+    message_to_screen('Press Space to unpause or Q to quit', white)
+    pygame.display.update()
+    paused = True
+
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    paused = False
+
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        clock.tick(5)
+
+
+def score(score):
+    text = small_font.render("Score: " + str(score), True, white)
+    gameDisplay.blit(text, [0, 0])
 
 
 def snake(block_size, snake_list, direction):
@@ -80,7 +106,7 @@ def game_intro():
 
     message_to_screen("Watch out for your tail and the edges", black)
 
-    message_to_screen("Press Space to play or Q to quit", black, -50)
+    message_to_screen("Press Space to play and Space to pause or Q to quit", black, -50)
 
     pygame.display.update()
 
@@ -117,6 +143,7 @@ def game_loop():
 
     snake_list = []
     snake_length = 3
+    original_snake_length = snake_length
 
     game_exit = False
     game_over = False
@@ -127,21 +154,24 @@ def game_loop():
 
             gameDisplay.fill(black)
             gameDisplay.blit(apple_img, (apple_x, apple_y))
+            
             snake(BLOCK_SIZE, snake_list, direction)
-            message_to_screen("Game over", red, 50, "large")
+            score(snake_length - original_snake_length)
 
+            message_to_screen("Game over", red, 50, "large")
             message_to_screen("Press Q to quit or Space to play again", white, -50, "med")
+
             pygame.display.update()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    game_exit = True
-                    game_over = False
+                    pygame.quit()
+                    quit()
                 if event.type == pygame.KEYDOWN:
 
                     if event.key == pygame.K_q:
-                        game_exit = True
-                        game_over = False
+                        pygame.quit()
+                        quit()
 
                     if event.key == pygame.K_SPACE:
                         game_loop()
@@ -180,6 +210,9 @@ def game_loop():
                         direction = "down"
                         actions_per_frame += 1
 
+                if event.key == pygame.K_SPACE:
+                    pause()
+
         lead_x += lead_x_change
         lead_y += lead_y_change
 
@@ -197,10 +230,6 @@ def game_loop():
 
         for segment in snake_list[1:-1]:
             if segment == snake_head:
-                lead_x -= lead_x_change
-                lead_y -= lead_y_change
-                message_to_screen('You crashed into yourself', red)
-                pygame.display.update()
                 game_over = True
                 continue
 
@@ -208,6 +237,8 @@ def game_loop():
             del snake_list[0]
 
         snake(BLOCK_SIZE, snake_list, direction)
+
+        score(snake_length - original_snake_length)
 
         if apple_x <= lead_x < apple_x + BLOCK_SIZE and apple_y <= lead_y < apple_y + BLOCK_SIZE:
             apple_x = random.randrange(0, display_width - BLOCK_SIZE + 1, 20)
