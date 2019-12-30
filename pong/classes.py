@@ -34,7 +34,7 @@ class Player:
 
 
 class Ball:
-    XVEL = 14
+    XVEL = 16
     YVEL = 10
     if random.randint(0, 1) == 1:
         XVEL *= -1
@@ -68,6 +68,12 @@ class Ball:
             if player2x < self.x + self.radius <= player2x + self.player_width or player2x < self.x + self.radius + self.radius * 2 < player2x:
                 if player2y < self.y < player2y + self.player_height or player2y < self.radius * 2 < player2y + self.player_height:
                     self.XVEL *= -1
+
+    def win_loss(self):
+        if self.x + self.radius * 2 <= 0 or self.x >= self.game_width:
+            return True
+        else:
+            return False
 
     def move(self):
         self.x += self.XVEL
