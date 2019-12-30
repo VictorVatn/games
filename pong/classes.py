@@ -34,7 +34,7 @@ class Player:
 
 
 class Ball:
-    XVEL = 16
+    XVEL = 14
     YVEL = 10
     if random.randint(0, 1) == 1:
         XVEL *= -1
