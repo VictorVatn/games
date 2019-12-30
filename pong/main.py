@@ -2,10 +2,16 @@ import pygame
 from pong.classes import *
 
 pygame.init()
+pygame.font.init()
+
+small_font = pygame.font.SysFont("comicsansms", 25)
+med_font = pygame.font.SysFont("comicsansms", 40)
+large_font = pygame.font.SysFont("comicsansms", 70)
 
 blue = (0, 50, 200)
 red = (255, 0, 0)
 black = (0, 0, 0)
+white = (255, 255, 255)
 
 
 player_width = 10
@@ -17,6 +23,46 @@ display_height = 600
 
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 gameDisplay.fill(black)
+
+
+def text_objects(text, color, size):
+    if size == 'small':
+        textSurface = small_font.render(text, True, color)
+        return textSurface, textSurface.get_rect()
+    elif size == 'med':
+        textSurface = med_font.render(text, True, color)
+        return textSurface, textSurface.get_rect()
+    elif size == 'large':
+        textSurface = large_font.render(text, True, color)
+        return textSurface, textSurface.get_rect()
+
+
+def message_to_screen(message, color, y_displace=0, size="small"):
+    textSurf, textRect = text_objects(message, color, size)
+    textRect.center = display_width // 2, display_height // 2 - y_displace
+    gameDisplay.blit(textSurf, textRect)
+
+def game_over(p1, p2, ball):
+
+    p1.draw(gameDisplay)
+    p2.draw(gameDisplay)
+    ball.draw(gameDisplay)
+    message_to_screen('Space To Continue or Q To Quit', white, -50)
+    pygame.display.update()
+
+    game_exit = False
+    while not exit:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    game_loop()
+
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
 
 def game_loop():
@@ -31,8 +77,14 @@ def game_loop():
 
     ball = Ball(display_width // 2, display_height // 2, blue, ball_size, display_width, display_height, player_width, player_height)
 
+    over = False
+
     run = True
     while run:
+
+        if over:
+            game_over(p1, p2, ball)
+
         p1_actions = 0
         p2_actions = 0
 
@@ -85,6 +137,7 @@ def game_loop():
         p2x, p2y = p2.coll_detect()
         ball.coll_detect(p1x, p1y, p2x, p2y)
         ball.move()
+        over = ball.win_loss()
 
         gameDisplay.fill(black)
 
