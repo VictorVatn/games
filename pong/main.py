@@ -20,9 +20,7 @@ ball_size = 7
 
 display_width = 1000
 display_height = 600
-
 gameDisplay = pygame.display.set_mode((display_width, display_height))
-gameDisplay.fill(black)
 
 
 def text_objects(text, color, size):
@@ -41,6 +39,7 @@ def message_to_screen(message, color, y_displace=0, size="small"):
     textSurf, textRect = text_objects(message, color, size)
     textRect.center = display_width // 2, display_height // 2 - y_displace
     gameDisplay.blit(textSurf, textRect)
+
 
 def game_over(p1, p2, ball):
 
@@ -77,8 +76,14 @@ def game_loop():
 
     ball = Ball(display_width // 2, display_height // 2, blue, ball_size, display_width, display_height, player_width, player_height)
 
-    over = False
+    gameDisplay.fill(black)
+    ball.draw(gameDisplay)
+    p1.draw(gameDisplay)
+    p2.draw(gameDisplay)
+    pygame.display.update()
 
+    pygame.time.wait(500)
+    over = False
     run = True
     while run:
 
