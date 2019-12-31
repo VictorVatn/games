@@ -129,6 +129,7 @@ def restart(player1, player2, ball):
 
     ball.x = display_width // 2
     ball.y = display_height // 2
+    ball.yvel = ball.starty_vel
 
     ball.xvel = ball.startx_vel
 
