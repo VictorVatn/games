@@ -13,10 +13,6 @@ def draw_window(ball, p1, p2):
     pygame.display.update()
 
 
-def game_over(ball, p1, p2):
-    draw_window(ball, p1, p2)
-    pygame.time.wait(500)
-    game_loop(p1, p2, ball)
 
 
 def message_to_screen(message, color, y_displace=0, x_displace=0, size="small"):
@@ -161,10 +157,10 @@ def game_loop(player1, player2, ball):
     player1_vel = 0
     player2_vel = 0
 
+    draw_window(ball, player1, player2)
+
     pygame.time.wait(500)
     run = True
-
-    draw_window(ball, player1, player2)
 
     while run:
 
@@ -211,4 +207,4 @@ def game_loop(player1, player2, ball):
 
             ball.x = display_width // 2
             ball.y = display_height // 2
-            game_over(ball, player1, player2)
+            game_loop(player1, player2, ball)
