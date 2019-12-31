@@ -53,59 +53,52 @@ class Player:
     def draw(self, win):
         pygame.draw.rect(win, self.color, [self.x, self.y, self.width, self.height])
 
-    def increase_point(self):
-        self.score += 1
-
 
 class Ball:
-    XVEL = 14
-    YVEL = 10
+    xvel = 14
+    yvel = 10
     if random.randint(0, 1) == 1:
-        XVEL *= -1
+        xvel *= -1
     if random.randint(0, 1) == 1:
-        YVEL *= -1
+        yvel *= -1
 
-    def __init__(self, x, y, color, radius, game_width, game_height, player_width, player_height):
+    def __init__(self, x, y, color, radius):
         self.x = x
         self.y = y
         self.color = color
         self.radius = radius
-        self.game_width = game_width
-        self.game_height = game_height
-        self.player_width = player_width
-        self.player_height = player_height
 
     def coll_detect_wall(self):
-        if self.YVEL < 0:
-            if self.y + self.YVEL <= 0:
-                self.YVEL *= -1
+        if self.yvel < 0:
+            if self.y + self.yvel <= 0:
+                self.yvel *= -1
 
         else:
-            if self.y + self.YVEL >= self.game_height:
-                self.YVEL *= -1
+            if self.y + self.yvel >= display_height:
+                self.yvel *= -1
 
     def coll_detect_player(self, player1x, player1y, player2x, player2y):
 
-        if self.XVEL < 0:
-            if player1x < self.x <= player1x + self.player_width or player1x < self.x + self.radius * 2 < player1x:
-                if player1y < self.y < player1y + self.player_height or player1y < self.x + self.radius * 2 < player1y:
-                    self.XVEL *= -1
-        elif self.XVEL > 0:
-            if player2x < self.x + self.radius <= player2x + self.player_width or player2x < self.x + self.radius + self.radius * 2 < player2x:
-                if player2y < self.y < player2y + self.player_height or player2y < self.radius * 2 < player2y + self.player_height:
-                    self.XVEL *= -1
+        if self.xvel < 0:
+            if player1x <= self.x <= player1x + player_width or player1x <= self.x + self.radius <= player1x + player_width:
+                if player1y <= self.y <= player1y + player_height or player1y <= self.y + self.radius <= player1y + player_height:
+                    self.xvel *= -1
+        else:
+            if player2x <= self.x + self.radius * 1.5 <= player2x + player_width or player2x <= self.x + self.radius <= player2x + player_width:
+                if player2y <= self.y <= player2y + player_height or player2y <= self.y + self.radius <= player2y + player_height:
+                    self.xvel *= -1
 
     def win_loss(self):
         if self.x + self.radius * 2 <= 0:
             return True
-        elif self.x >= self.game_width:
+        elif self.x >= display_width:
             return True
         else:
             return False
 
     def move(self):
-        self.x += self.XVEL
-        self.y += self.YVEL
+        self.x += self.xvel
+        self.y += self.yvel
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
