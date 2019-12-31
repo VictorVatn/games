@@ -1,8 +1,8 @@
 import pygame
 import random
+
 pygame.init()
 pygame.font.init()
-
 
 small_font = pygame.font.SysFont("comicsansms", 25)
 med_font = pygame.font.SysFont("comicsansms", 40)
@@ -55,18 +55,23 @@ class Player:
 
 
 class Ball:
-    xvel = 14
-    yvel = 10
+    startx_vel = 15
+    xvel = startx_vel
+    yvel = random.randint(8, 12)
     if random.randint(0, 1) == 1:
         xvel *= -1
     if random.randint(0, 1) == 1:
         yvel *= -1
 
-    def __init__(self, x, y, color, radius):
+    def __init__(self, x, y, color, radius, display_width, display_height, player_width, player_height):
         self.x = x
         self.y = y
         self.color = color
         self.radius = radius
+        self.display_height = display_height
+        self.player_width = player_width
+        self.player_height = player_height
+        self.display_width = display_width
 
     def coll_detect_wall(self):
         if self.yvel < 0:
@@ -74,24 +79,24 @@ class Ball:
                 self.yvel *= -1
 
         else:
-            if self.y + self.yvel >= display_height:
+            if self.y + self.yvel >= self.display_height:
                 self.yvel *= -1
 
     def coll_detect_player(self, player1x, player1y, player2x, player2y):
 
         if self.xvel < 0:
-            if player1x <= self.x <= player1x + player_width or player1x <= self.x + self.radius <= player1x + player_width:
-                if player1y <= self.y <= player1y + player_height or player1y <= self.y + self.radius <= player1y + player_height:
-                    self.xvel *= -1
+            if player1x <= self.x <= player1x + self.player_width or player1x <= self.x + self.radius <= player1x + self.player_width:
+                if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius <= player1y + self.player_height:
+                    self.xvel = 25
         else:
-            if player2x <= self.x + self.radius * 1.5 <= player2x + player_width or player2x <= self.x + self.radius <= player2x + player_width:
-                if player2y <= self.y <= player2y + player_height or player2y <= self.y + self.radius <= player2y + player_height:
-                    self.xvel *= -1
+            if player2x <= self.x + self.radius * 1.5 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
+                if player2y <= self.y <= player2y + self.player_height or player2y <= self.y + self.radius <= player2y + self.player_height:
+                    self.xvel = -25
 
     def win_loss(self):
         if self.x + self.radius * 2 <= 0:
             return True
-        elif self.x >= display_width:
+        elif self.x >= self.display_width:
             return True
         else:
             return False
