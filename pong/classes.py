@@ -57,7 +57,7 @@ class Player:
 class Ball:
     startx_vel = 15
     xvel = startx_vel
-    yvel = random.randint(9, 11)
+    yvel = 10
     if random.randint(0, 1) == 1:
         xvel *= -1
     if random.randint(0, 1) == 1:
