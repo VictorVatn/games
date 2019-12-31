@@ -3,13 +3,14 @@ FPS = pygame.time.Clock()
 
 
 def homeScreen():
-    intro = True
 
+    gameDisplay.fill(black)
     message_to_screen('Welcome to my first game without any help', white, 50, size='med')
     message_to_screen("If you're by yourself press 1 but if you have someone to play with press 2", white, size='small')
     message_to_screen("While in game press Space to pause and Q to quit", white, -40, size='small')
     pygame.display.update()
 
+    intro = True
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -25,7 +26,7 @@ def homeScreen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
+        FPS.tick(15)
 
 
 def draw_window(ball, p1, p2):
@@ -63,7 +64,6 @@ def collision(p1x, p1y, p2x, p2y, ball):
 
 
 def key_getter_game(player1, player2, y_vel, player1_vel, player2_vel):
-    # From here to line 57 is just for checking if the player wants to quit or pause but 59 onwards is for movement
 
     p2_actions = 0
     p1_actions = 0
@@ -74,8 +74,7 @@ def key_getter_game(player1, player2, y_vel, player1_vel, player2_vel):
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_q:
-                pygame.quit()
-                quit()
+                homeScreen()
 
             if event.key == pygame.K_SPACE:
                 key_getter()
@@ -144,8 +143,8 @@ def key_getter():
                 if event.key == pygame.K_SPACE:
                     waiting = False
                 elif event.key == pygame.K_q:
-                    pygame.quit()
-                    quit()
+                    homeScreen()
+        FPS.tick(15)
 
 
 def win_2player(winner):
@@ -178,8 +177,8 @@ def game_start_2player():
                      0)
 
     ball = Ball(
-        display_width / 2 + ball_size // 2,
-        display_height / 2 + ball_size // 2,
+        display_width // 2 + ball_size // 2,
+        display_height // 2 + ball_size // 2,
         blue,
         ball_size,
         display_width,
@@ -245,7 +244,7 @@ def game_loop_2player(player1, player2, ball):
 
 def win_1player(winner):
 
-    message_to_screen(winner + 'WINS!', white, 20, size='large')
+    message_to_screen(winner + ' WINS!', white, 20, size='large')
     message_to_screen('Space to play again Q to quit', white, -50, size='small')
     pygame.display.update()
 
@@ -255,7 +254,6 @@ def win_1player(winner):
 
 
 def key_getter_game_1player(player1, player1_vel, y_vel):
-    # From here to line 250 is just for checking if the player wants to quit or pause but 59 onwards is for movement
 
     p1_actions = 0
     for event in pygame.event.get():
@@ -265,8 +263,7 @@ def key_getter_game_1player(player1, player1_vel, y_vel):
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_q:
-                pygame.quit()
-                quit()
+                homeScreen()
 
             if event.key == pygame.K_SPACE:
                 key_getter()
@@ -352,8 +349,6 @@ def game_loop_1player(player1, player2, ball):
         player1.move(player1_vel)
         player2.move(player2_vel)
         ball.move()
-
-
 
         draw_window(ball, player1, player2)
 
