@@ -14,7 +14,7 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 
 
-player_width = 10
+player_width = 15
 player_height = 60
 ball_size = 7
 
@@ -33,22 +33,21 @@ class Player:
         self.height = height
         self.display_height = display_height
         self.score = score
+        self.vel = 0
 
-    def move(self, vel):
+    def move(self):
         move_or_not = True
         move_or_not2 = True
 
-        if self.display_height <= self.y + self.height and vel > 0:
+        if self.display_height <= self.y + self.height and self.vel > 0:
             move_or_not = False
 
-        if 0 >= self.y and vel < 0:
+        if 0 >= self.y and self.vel < 0:
             move_or_not2 = False
 
-        if move_or_not and move_or_not2:
-            self.y += vel
-
-    def coll_detect(self):
-        return self.x, self.y
+        if not move_or_not or not move_or_not2:
+            self.vel = 0
+        self.y += self.vel
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, [self.x, self.y, self.width, self.height])
@@ -82,16 +81,41 @@ class Ball:
             if self.y + self.yvel >= self.display_height:
                 self.yvel *= -1
 
-    def coll_detect_player(self, player1x, player1y, player2x, player2y):
+    def coll_detect_player(self, player1x, player1y, player2x, player2y, player1_vel, player2_vel):
 
         if self.xvel < 0:
             if player1x <= self.x <= player1x + self.player_width * 2 or player1x <= self.x + self.radius <= player1x + self.player_width:
                 if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius <= player1y + self.player_height:
-                    self.xvel = 15
+                    self.xvel = 25
+                    if player1_vel > 0:
+                        self.yvel = -10
+
+                    elif player1_vel < 0:
+                        self.yvel = 10
+
+                    elif player1_vel == 0:
+                        self.yvel = 0
+                    self.yvel += round(((player1y + player_height / 2) - (self.y + self.radius)))
+
+
         else:
             if player2x <= self.x + self.radius * 2 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
                 if player2y <= self.y <= player2y + self.player_height or player2y <= self.y + self.radius <= player2y + self.player_height:
-                    self.xvel = -15
+                    self.xvel = -25
+
+                    if player2_vel > 0:
+                        self.yvel = -6
+
+                    elif player2_vel < 0:
+                        self.yvel = 6
+
+                    elif player2_vel == 0:
+                        self.yvel = 0
+                    self.yvel += round(((player2y + player_height / 2) - (self.y + self.radius)))
+        if self.yvel > 12:
+            self.yvel = 12
+        elif self.yvel < -12:
+            self.yvel = -12
 
     def win_loss(self):
         if self.x + self.radius * 2 <= 0:
