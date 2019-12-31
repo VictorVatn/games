@@ -1,4 +1,5 @@
 from pong.classes import *
+FPS = pygame.time.Clock()
 
 
 def draw_window(ball, p1, p2):
@@ -155,7 +156,6 @@ def game_start():
 
 
 def game_loop(player1, player2, ball):
-    FPS = pygame.time.Clock()
 
     y_vel = 10
     player1_vel = 0
@@ -190,6 +190,8 @@ def game_loop(player1, player2, ball):
                 player2.score += 1
 
             if player1.score == 5 or player2.score == 5:
+
+                draw_window(ball, player1, player2)
 
                 if player1.score == 5:
                     player1.score = 0
