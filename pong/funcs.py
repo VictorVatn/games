@@ -17,7 +17,7 @@ def homeScreen():
 
                 if event.key == pygame.K_1:
                     intro = False
-                    game_start_1player()
+                    game_start_1player("easy")
 
                 elif event.key == pygame.K_2:
                     intro = False
@@ -240,6 +240,18 @@ def game_loop_2player(player1, player2, ball):
 
 # One player version functions only from here onwards
 
+def easy(player2, ball, player_speed):
+    if player2.y + player_height // 2 > ball.y and ball.xvel > 0:
+        player2.vel = -player_speed
+        player2.move()
+
+    elif player2.y + player_height // 2 < ball.y and ball.xvel > 0:
+        player2.vel = player_speed
+        player2.move()
+
+    else:
+        player2.vel = 0
+
 def win_1player(winner):
 
     message_to_screen(winner + 'WINS!', white, 20, size='large')
@@ -248,7 +260,7 @@ def win_1player(winner):
 
     key_getter()
 
-    game_start_1player()
+    game_start_1player("easy")
 
 
 def key_getter_game_1player(player1, y_vel):
@@ -288,7 +300,8 @@ def key_getter_game_1player(player1, y_vel):
     return player1.vel
 
 
-def game_start_1player():
+def game_start_1player(difficulties):
+    difficulty = 0
 
     player1 = Player(player_width,
                      display_height / 2 - player_height / 2,
@@ -316,10 +329,13 @@ def game_start_1player():
                 player_width,
                 player_height)
 
-    game_loop_1player(player1, player2, ball)
+    if difficulties == 'easy':
+        difficulty = easy
+
+    game_loop_1player(player1, player2, ball, difficulty)
 
 
-def game_loop_1player(player1, player2, ball):
+def game_loop_1player(player1, player2, ball, difficulty):
 
     player_speed = 10
 
@@ -331,17 +347,7 @@ def game_loop_1player(player1, player2, ball):
     while run:
         FPS.tick(20)
         player1.vel = key_getter_game_1player(player1, player_speed)
-
-        if player2.y + player_height // 2 > ball.y and ball.xvel > 0:
-            player2.vel = -player_speed
-            player2.move()
-
-        elif player2.y + player_height // 2 < ball.y and ball.xvel > 0:
-            player2.vel = player_speed
-            player2.move()
-
-        else:
-            player2.vel = 0
+        difficulty(player2, ball, player_speed)
 
         collision(player1, player2, ball, player1.vel, player2.vel)
 
@@ -373,4 +379,4 @@ def game_loop_1player(player1, player2, ball):
                     win_1player('CPU')
 
             restart(player1, player2, ball)
-            game_loop_1player(player1, player2, ball)
+            game_loop_1player(player1, player2, ball, difficulty)
