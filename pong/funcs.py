@@ -58,12 +58,12 @@ def text_objects(text, color, size):
         return textSurface, textSurface.get_rect()
 
 
-def collision(p1x, p1y, p2x, p2y, ball):
+def collision(player1, player2, ball, player1_vel, player2_vel):
     ball.coll_detect_wall()
-    ball.coll_detect_player(p1x, p1y, p2x, p2y)
+    ball.coll_detect_player(player1.x, player1.y, player2.x, player2.y, player1_vel, player2_vel)
 
 
-def key_getter_game(player1, player2, y_vel, player1_vel, player2_vel):
+def key_getter_game(player1, player2, y_vel):
 
     p2_actions = 0
     p1_actions = 0
@@ -80,43 +80,44 @@ def key_getter_game(player1, player2, y_vel, player1_vel, player2_vel):
                 key_getter()
 
             if event.key == pygame.K_UP and p2_actions == 0:
-                player2_vel = -y_vel
+                player2.vel = -y_vel
                 p2_actions = 1
 
             elif event.key == pygame.K_DOWN and p2_actions == 0:
-                player2_vel = y_vel
+                player2.vel = y_vel
                 p2_actions = 1
 
             elif event.key == pygame.K_w and p1_actions == 0:
-                player1_vel = -y_vel
+                player1.vel = -y_vel
                 p1_actions = 1
 
             elif event.key == pygame.K_s and p1_actions == 0:
-                player1_vel = y_vel
+                player1.vel = y_vel
                 p1_actions = 1
 
         if event.type == pygame.KEYUP:
 
             if event.key == pygame.K_UP:
                 if p2_actions == 1:
-                    player2.move(player2_vel)
-                player2_vel = -0
+                    player2.move()
+                player2.vel = 0
 
             elif event.key == pygame.K_DOWN:
                 if p2_actions == 1:
-                    player2.move(player2_vel)
-                player2_vel = 0
+                    player2.move()
+                player2.vel = 0
 
             elif event.key == pygame.K_w:
                 if p1_actions == 1:
-                    player1.move(player1_vel)
-                player1_vel = 0
+                    player1.move()
+                player1.vel = 0
 
             elif event.key == pygame.K_s:
                 if p1_actions == 1:
-                    player1.move(player1_vel)
-                player1_vel = 0
-    return y_vel, player1_vel, player2_vel
+                    player1.move()
+                player1.vel = 0
+
+    return player1.vel, player2.vel
 
 
 def restart(player1, player2, ball):
@@ -149,7 +150,7 @@ def key_getter():
 
 def win_2player(winner):
 
-    message_to_screen(winner + 'WINS!', white, 20, size='large')
+    message_to_screen(winner + ' WINS!', white, 20, size='large')
     message_to_screen('Space to play again Q to quit', white, -50, size='small')
     pygame.display.update()
 
@@ -190,9 +191,7 @@ def game_start_2player():
 
 def game_loop_2player(player1, player2, ball):
 
-    y_vel = 10
-    player1_vel = 0
-    player2_vel = 0
+    player_speed = 10
 
     draw_window(ball, player1, player2)
 
@@ -202,15 +201,13 @@ def game_loop_2player(player1, player2, ball):
     while run:
         FPS.tick(20)
 
-        y_vel, player1_vel, player2_vel = key_getter_game(player1, player2, y_vel, player1_vel, player2_vel)
+        player1.vel, player2.vel = key_getter_game(player1, player2, player_speed)
 
-        player1.move(player1_vel)
-        player2.move(player2_vel)
+        player1.move()
+        player2.move()
         ball.move()
 
-        p1x, p1y = player1.coll_detect()
-        p2x, p2y = player2.coll_detect()
-        collision(p1x, p1y, p2x, p2y, ball)
+        collision(player1, player2, ball, player1.vel, player2.vel)
 
         draw_window(ball, player1, player2)
 
@@ -239,12 +236,12 @@ def game_loop_2player(player1, player2, ball):
             restart(player1, player2, ball)
             game_loop_2player(player1, player2, ball)
 
-# One player version functions only from here
 
+# One player version functions only from here onwards
 
 def win_1player(winner):
 
-    message_to_screen(winner + ' WINS!', white, 20, size='large')
+    message_to_screen(winner + 'WINS!', white, 20, size='large')
     message_to_screen('Space to play again Q to quit', white, -50, size='small')
     pygame.display.update()
 
@@ -253,7 +250,7 @@ def win_1player(winner):
     game_start_1player()
 
 
-def key_getter_game_1player(player1, player1_vel, y_vel):
+def key_getter_game_1player(player1, y_vel):
 
     p1_actions = 0
     for event in pygame.event.get():
@@ -269,29 +266,29 @@ def key_getter_game_1player(player1, player1_vel, y_vel):
                 key_getter()
 
             elif event.key == pygame.K_w or event.key == pygame.K_UP and p1_actions == 0:
-                player1_vel = -y_vel
+                player1.vel = -y_vel
                 p1_actions = 1
 
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN and p1_actions == 0:
-                player1_vel = y_vel
+                player1.vel = y_vel
                 p1_actions = 1
 
         if event.type == pygame.KEYUP:
 
             if event.key == pygame.K_w or event.key == pygame.K_UP:
                 if p1_actions == 1:
-                    player1.move(player1_vel)
-                player1_vel = 0
+                    player1.move()
+                player1.vel = 0
 
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 if p1_actions == 1:
-                    player1.move(player1_vel)
-                player1_vel = 0
-
-    return player1_vel
+                    player1.move()
+                player1.vel = 0
+    return player1.vel
 
 
 def game_start_1player():
+
     player1 = Player(player_width,
                      display_height / 2 - player_height / 2,
                      red,
@@ -309,23 +306,21 @@ def game_start_1player():
                      display_height,
                      0)
 
-    ball = Ball(
-        display_width // 2 + ball_size // 2,
-        display_height // 2 + ball_size // 2,
-        blue,
-        ball_size,
-        display_width,
-        display_height,
-        player_width,
-        player_height)
+    ball = Ball(display_width // 2 + ball_size // 2,
+                display_height // 2 + ball_size // 2,
+                blue,
+                ball_size,
+                display_width,
+                display_height,
+                player_width,
+                player_height)
+
     game_loop_1player(player1, player2, ball)
 
 
 def game_loop_1player(player1, player2, ball):
 
-    y_vel = 10
-    player1_vel = 0
-    player2_vel = 0
+    player_speed = 10
 
     draw_window(ball, player1, player2)
 
@@ -334,20 +329,22 @@ def game_loop_1player(player1, player2, ball):
 
     while run:
         FPS.tick(20)
-        player1_vel = key_getter_game_1player(player1, player1_vel, y_vel)
+        player1.vel = key_getter_game_1player(player1, player_speed)
 
         if player2.y + player_height // 2 > ball.y and ball.xvel > 0:
-            player2.move(-y_vel)
+            player2.vel = -player_speed
+            player2.move()
 
         elif player2.y + player_height // 2 < ball.y and ball.xvel > 0:
-            player2.move(y_vel)
+            player2.vel = player_speed
+            player2.move()
 
-        p1x, p1y = player1.coll_detect()
-        p2x, p2y = player2.coll_detect()
-        collision(p1x, p1y, p2x, p2y, ball)
+        else:
+            player2.vel = 0
 
-        player1.move(player1_vel)
-        player2.move(player2_vel)
+        collision(player1, player2, ball, player1.vel, player2.vel)
+
+        player1.move()
         ball.move()
 
         draw_window(ball, player1, player2)
@@ -367,11 +364,12 @@ def game_loop_1player(player1, player2, ball):
                 if player1.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_2player('PLAYER1')
+                    win_1player('PLAYER1')
 
                 elif player2.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_2player('CPU')
+                    win_1player('CPU')
+
             restart(player1, player2, ball)
             game_loop_1player(player1, player2, ball)
