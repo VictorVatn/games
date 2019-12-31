@@ -121,10 +121,10 @@ def key_getter_game(player1, player2, y_vel, player1_vel, player2_vel):
 
 
 def restart(player1, player2, ball):
-    player2.x = display_width - player_width
+    player2.x = display_width - player_width * 2
     player2.y = display_height / 2 - player_height / 2
 
-    player1.x = 0
+    player1.x = player_width
     player1.y = display_height / 2 - player_height / 2
 
     ball.x = display_width // 2
@@ -160,7 +160,7 @@ def win_2player(winner):
 
 
 def game_start_2player():
-    player1 = Player(0,
+    player1 = Player(player_width,
                      display_height / 2 - player_height / 2,
                      red,
                      player_width,
@@ -169,7 +169,7 @@ def game_start_2player():
                      0)
 
     player2 = Player(display_width -
-                     player_width,
+                     player_width * 2,
                      display_height / 2 - player_height / 2,
                      red,
                      player_width,
@@ -178,8 +178,8 @@ def game_start_2player():
                      0)
 
     ball = Ball(
-        display_width // 2,
-        display_height // 2,
+        display_width / 2 + ball_size // 2,
+        display_height / 2 + ball_size // 2,
         blue,
         ball_size,
         display_width,
@@ -201,7 +201,7 @@ def game_loop_2player(player1, player2, ball):
     run = True
 
     while run:
-        FPS.tick(15)
+        FPS.tick(20)
 
         y_vel, player1_vel, player2_vel = key_getter_game(player1, player2, y_vel, player1_vel, player2_vel)
 
@@ -295,7 +295,7 @@ def key_getter_game_1player(player1, player1_vel, y_vel):
 
 
 def game_start_1player():
-    player1 = Player(0,
+    player1 = Player(player_width,
                      display_height / 2 - player_height / 2,
                      red,
                      player_width,
@@ -304,7 +304,7 @@ def game_start_1player():
                      0)
 
     player2 = Player(display_width -
-                     player_width,
+                     player_width * 2,
                      display_height / 2 - player_height / 2,
                      red,
                      player_width,
@@ -313,8 +313,8 @@ def game_start_1player():
                      0)
 
     ball = Ball(
-        display_width // 2,
-        display_height // 2,
+        display_width // 2 + ball_size // 2,
+        display_height // 2 + ball_size // 2,
         blue,
         ball_size,
         display_width,
@@ -336,7 +336,7 @@ def game_loop_1player(player1, player2, ball):
     run = True
 
     while run:
-        FPS.tick(15)
+        FPS.tick(20)
         player1_vel = key_getter_game_1player(player1, player1_vel, y_vel)
 
         if player2.y + player_height // 2 > ball.y and ball.xvel > 0:
@@ -345,13 +345,15 @@ def game_loop_1player(player1, player2, ball):
         elif player2.y + player_height // 2 < ball.y and ball.xvel > 0:
             player2.move(y_vel)
 
+        p1x, p1y = player1.coll_detect()
+        p2x, p2y = player2.coll_detect()
+        collision(p1x, p1y, p2x, p2y, ball)
+
         player1.move(player1_vel)
         player2.move(player2_vel)
         ball.move()
 
-        p1x, p1y = player1.coll_detect()
-        p2x, p2y = player2.coll_detect()
-        collision(p1x, p1y, p2x, p2y, ball)
+
 
         draw_window(ball, player1, player2)
 
