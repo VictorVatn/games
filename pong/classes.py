@@ -1,17 +1,38 @@
 import pygame
 import random
 pygame.init()
+pygame.font.init()
+
+
+small_font = pygame.font.SysFont("comicsansms", 25)
+med_font = pygame.font.SysFont("comicsansms", 40)
+large_font = pygame.font.SysFont("comicsansms", 70)
+
+blue = (0, 50, 200)
+red = (255, 0, 0)
+black = (0, 0, 0)
+white = (255, 255, 255)
+
+
+player_width = 10
+player_height = 60
+ball_size = 7
+
+display_width = 1000
+display_height = 600
+gameDisplay = pygame.display.set_mode((display_width, display_height))
 
 
 class Player:
 
-    def __init__(self, x, y, color, width, height, display_height):
+    def __init__(self, x, y, color, width, height, display_height, score):
         self.x = x
         self.y = y
         self.color = color
         self.width = width
         self.height = height
         self.display_height = display_height
+        self.score = score
 
     def move(self, vel):
         move_or_not = True
@@ -32,6 +53,9 @@ class Player:
     def draw(self, win):
         pygame.draw.rect(win, self.color, [self.x, self.y, self.width, self.height])
 
+    def increase_point(self):
+        self.score += 1
+
 
 class Ball:
     XVEL = 14
@@ -51,7 +75,7 @@ class Ball:
         self.player_width = player_width
         self.player_height = player_height
 
-    def coll_detect(self, player1x, player1y, player2x, player2y):
+    def coll_detect_wall(self):
         if self.YVEL < 0:
             if self.y + self.YVEL <= 0:
                 self.YVEL *= -1
@@ -59,6 +83,8 @@ class Ball:
         else:
             if self.y + self.YVEL >= self.game_height:
                 self.YVEL *= -1
+
+    def coll_detect_player(self, player1x, player1y, player2x, player2y):
 
         if self.XVEL < 0:
             if player1x < self.x <= player1x + self.player_width or player1x < self.x + self.radius * 2 < player1x:
@@ -70,7 +96,9 @@ class Ball:
                     self.XVEL *= -1
 
     def win_loss(self):
-        if self.x + self.radius * 2 <= 0 or self.x >= self.game_width:
+        if self.x + self.radius * 2 <= 0:
+            return True
+        elif self.x >= self.game_width:
             return True
         else:
             return False
@@ -81,4 +109,3 @@ class Ball:
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
-
