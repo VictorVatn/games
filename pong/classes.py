@@ -85,13 +85,13 @@ class Ball:
     def coll_detect_player(self, player1x, player1y, player2x, player2y):
 
         if self.xvel < 0:
-            if player1x <= self.x <= player1x + self.player_width or player1x <= self.x + self.radius <= player1x + self.player_width:
+            if player1x <= self.x <= player1x + self.player_width * 2 or player1x <= self.x + self.radius <= player1x + self.player_width:
                 if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius <= player1y + self.player_height:
-                    self.xvel = 25
+                    self.xvel = 15
         else:
-            if player2x <= self.x + self.radius * 1.5 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
+            if player2x <= self.x + self.radius * 2 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
                 if player2y <= self.y <= player2y + self.player_height or player2y <= self.y + self.radius <= player2y + self.player_height:
-                    self.xvel = -25
+                    self.xvel = -15
 
     def win_loss(self):
         if self.x + self.radius * 2 <= 0:
