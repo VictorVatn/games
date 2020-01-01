@@ -9,10 +9,17 @@ med_font = pygame.font.SysFont("comicsansms", 40)
 large_font = pygame.font.SysFont("comicsansms", 70)
 
 blue = (0, 50, 200)
-red = (255, 0, 0)
+red = (240, 0, 0)
+light_red = (255, 40, 40)
+
 black = (0, 0, 0)
 white = (255, 255, 255)
 
+green = (14, 201, 52)
+light_green = (14, 255, 52)
+
+yellow = (230, 230, 0)
+light_yellow = (255, 255, 100)
 
 player_width = 15
 player_height = 60
@@ -21,6 +28,7 @@ ball_size = 7
 display_width = 1000
 display_height = 600
 gameDisplay = pygame.display.set_mode((display_width, display_height))
+pygame.display.set_caption('PONG ULTIMATE')
 
 
 class Player:
@@ -57,12 +65,12 @@ class Ball:
     max_yvel = 18
     starty_vel = 10
     startx_vel = 15
-    xvel = startx_vel
-    yvel = 10
+    xVel = startx_vel
+    yVel = 10
     if random.randint(0, 1) == 1:
-        xvel *= -1
+        xVel *= -1
     if random.randint(0, 1) == 1:
-        yvel *= -1
+        yVel *= -1
 
     def __init__(self, x, y, color, radius, display_width, display_height, player_width, player_height):
         self.x = x
@@ -75,50 +83,49 @@ class Ball:
         self.display_width = display_width
 
     def coll_detect_wall(self):
-        if self.yvel < 0:
-            if self.y + self.yvel <= 0:
-                self.yvel *= -1
+        if self.yVel < 0:
+            if self.y + self.yVel <= 0:
+                self.yVel *= -1
 
         else:
-            if self.y + self.yvel >= self.display_height:
-                self.yvel *= -1
+            if self.y + self.yVel >= self.display_height:
+                self.yVel *= -1
 
     def coll_detect_player(self, player1x, player1y, player2x, player2y, player1_vel, player2_vel):
 
-        if self.xvel < 0:
+        if self.xVel < 0:
             if player1x <= self.x <= player1x + self.player_width * 2 or player1x <= self.x + self.radius <= player1x + self.player_width:
                 if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius * 2 <= player1y + self.player_height:
-                    self.xvel = 25
+                    self.xVel = 25
                     if player1_vel > 0:
-                        self.yvel = -8
+                        self.yVel = -8
 
                     elif player1_vel < 0:
-                        self.yvel = 8
+                        self.yVel = 8
 
                     elif player1_vel == 0:
-                        self.yvel = 0
-                    self.yvel += round(((player1y + player_height / 2) - (self.y + self.radius)) / 2)
-
+                        self.yVel = 0
+                    self.yVel += round(((player1y + player_height / 2) - (self.y + self.radius)) / 2)
 
         else:
             if player2x <= self.x + self.radius * 2 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
                 if player2y <= self.y <= player2y + self.player_height or player2y <= self.y + self.radius * 2 <= player2y + self.player_height:
-                    self.xvel = -25
+                    self.xVel = -25
 
                     if player2_vel > 0:
-                        self.yvel = -10
+                        self.yVel = -10
 
                     elif player2_vel < 0:
-                        self.yvel = 10
+                        self.yVel = 10
 
                     elif player2_vel == 0:
-                        self.yvel = 0
-                    self.yvel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 3)
+                        self.yVel = 0
+                    self.yVel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 3)
 
-        if self.yvel > self.max_yvel:
-            self.yvel = self.max_yvel
-        elif self.yvel < -self.max_yvel:
-            self.yvel = -self.max_yvel
+        if self.yVel > self.max_yvel:
+            self.yVel = self.max_yvel
+        elif self.yVel < -self.max_yvel:
+            self.yVel = -self.max_yvel
 
     def win_loss(self):
         if self.x + self.radius * 2 <= 0:
@@ -129,8 +136,8 @@ class Ball:
             return False
 
     def move(self):
-        self.x += self.xvel
-        self.y += self.yvel
+        self.x += self.xVel
+        self.y += self.yVel
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
