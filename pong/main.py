@@ -1,2 +1,2 @@
-from pong.funcs import *
+from funcs import *
 homeScreen()
