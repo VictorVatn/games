@@ -21,7 +21,7 @@ light_green = (14, 255, 52)
 yellow = (230, 230, 0)
 light_yellow = (255, 255, 100)
 
-player_width = 15
+player_width = 10
 player_height = 60
 ball_size = 7
 
@@ -64,7 +64,7 @@ class Player:
 class Ball:
     max_yvel = 18
     starty_vel = 10
-    startx_vel = 15
+    startx_vel = 12
     xVel = startx_vel
     yVel = 10
     if random.randint(0, 1) == 1:
@@ -83,20 +83,20 @@ class Ball:
         self.display_width = display_width
 
     def coll_detect_wall(self):
-        if self.yVel < 0:
-            if self.y + self.yVel <= 0:
-                self.yVel *= -1
+        if self.y + self.yVel <= 0:
+            self.yVel *= -1
 
-        else:
-            if self.y + self.yVel >= self.display_height:
-                self.yVel *= -1
+        elif self.y + self.yVel >= self.display_height:
+            self.yVel *= -1
 
     def coll_detect_player(self, player1x, player1y, player2x, player2y, player1_vel, player2_vel):
 
         if self.xVel < 0:
-            if player1x <= self.x <= player1x + self.player_width * 2 or player1x <= self.x + self.radius <= player1x + self.player_width:
+            if self.x + self.xVel <= player1x + self.player_width:
                 if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius * 2 <= player1y + self.player_height:
-                    self.xVel = 25
+                    self.xVel = 20
+                    self.x = player1x + self.player_width - self.xVel + self.radius
+
                     if player1_vel > 0:
                         self.yVel = -8
 
@@ -108,9 +108,10 @@ class Ball:
                     self.yVel += round(((player1y + player_height / 2) - (self.y + self.radius)) / 2)
 
         else:
-            if player2x <= self.x + self.radius * 2 <= player2x + self.player_width or player2x <= self.x + self.radius <= player2x + self.player_width:
+            if player2x <= self.x + self.radius * 2 + self.xVel:
                 if player2y <= self.y <= player2y + self.player_height or player2y <= self.y + self.radius * 2 <= player2y + self.player_height:
-                    self.xVel = -25
+                    self.xVel = -20
+                    self.x = player2x - self.xVel - self.radius
 
                     if player2_vel > 0:
                         self.yVel = -10
@@ -120,7 +121,7 @@ class Ball:
 
                     elif player2_vel == 0:
                         self.yVel = 0
-                    self.yVel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 3)
+                    self.yVel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 2)
 
         if self.yVel > self.max_yvel:
             self.yVel = self.max_yvel
