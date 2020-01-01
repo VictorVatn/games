@@ -62,7 +62,7 @@ class Player:
 
 
 class Ball:
-    max_yvel = 18
+    max_yvel = 14
     starty_vel = 10
     startx_vel = 12
     xVel = startx_vel
@@ -92,7 +92,7 @@ class Ball:
     def coll_detect_player(self, player1x, player1y, player2x, player2y, player1_vel, player2_vel):
 
         if self.xVel < 0:
-            if self.x + self.xVel <= player1x + self.player_width:
+            if 0 <= self.x + self.xVel <= player1x + self.player_width:
                 if player1y <= self.y <= player1y + self.player_height or player1y <= self.y + self.radius * 2 <= player1y + self.player_height:
                     self.xVel = 20
                     self.x = player1x + self.player_width - self.xVel + self.radius
@@ -105,7 +105,7 @@ class Ball:
 
                     elif player1_vel == 0:
                         self.yVel = 0
-                    self.yVel += round(((player1y + player_height / 2) - (self.y + self.radius)) / 2)
+                    self.yVel += round(((player1y + player_height / 2) - (self.y + self.radius)) / 3)
 
         else:
             if player2x <= self.x + self.radius * 2 + self.xVel:
@@ -121,7 +121,7 @@ class Ball:
 
                     elif player2_vel == 0:
                         self.yVel = 0
-                    self.yVel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 2)
+                    self.yVel += round(((player2y + player_height / 2) - (self.y + self.radius)) / 3)
 
         if self.yVel > self.max_yvel:
             self.yVel = self.max_yvel
