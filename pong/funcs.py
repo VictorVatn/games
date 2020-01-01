@@ -210,22 +210,11 @@ def restart(player1, player2, ball, scorer=''):
 
 
 def restart_frantic(player1, player2, ball, ball2):
-    player2.x = display_width - player_width * 2
-    player2.y = display_height / 2 - player_height / 2
 
-    player1.x = player_width
-    player1.y = display_height / 2 - player_height / 2
+    restart(player1, player2, ball)
 
-    ball.x = display_width // 2
     ball2.x = display_width // 2
-    ball.y = display_height // 2
     ball2.y = display_height // 2
-
-    if random.randint(0, 1) == 1:
-        ball.yVel = ball.starty_vel
-
-    else:
-        ball.yVel = -ball.starty_vel
 
     if random.randint(0, 1) == 1:
         ball2.yVel = ball.starty_vel
@@ -355,9 +344,9 @@ def game_loop_frantic(player1, player2, ball, ball2):
             ball_over = ball.win_loss()
 
         if not ball2_over:
-            ball2_over = ball.win_loss()
+            ball2_over = ball2.win_loss()
 
-        if ball_over:
+        if ball_over and ball.x != -10 and ball.y != -10:
             if ball.xVel > 0:
                 player1.score += 1
 
@@ -366,7 +355,7 @@ def game_loop_frantic(player1, player2, ball, ball2):
             ball.x = -10
             ball.y = -10
 
-        if ball2_over:
+        if ball2_over and ball2.x != -10 and ball2.y != -10:
             if ball2.xVel > 0:
                 player1.score += 1
 
@@ -375,9 +364,18 @@ def game_loop_frantic(player1, player2, ball, ball2):
             ball2.x = -10
             ball2.y = -10
 
-        if ball_over and ball2_over:
+        if ball2_over and ball_over:
             restart_frantic(player1, player2, ball, ball2)
             game_loop_frantic(player1, player2, ball, ball2)
+
+        if player1.score >= 5 or player2.score >= 5 and abs(player1.score - player2.score) >= 2:
+            restart_frantic(player1, player2, ball, ball2)
+            draw_window_frantic(ball, ball2, player1, player2)
+
+            if player1.score > player2.score:
+                win_player('Player1', 2, 'frantic')
+            else:
+                win_player('Player1', 2, 'frantic')
 
 
 def game_loop_2player(player1, player2, ball):
