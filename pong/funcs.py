@@ -54,15 +54,6 @@ def homeScreen():
         pygame.display.update()
 
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-
-                if event.key == pygame.K_1:
-                    intro = False
-                    game_start(1, "medium")
-
-                elif event.key == pygame.K_2:
-                    intro = False
-                    game_start(2)
 
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -86,7 +77,7 @@ def button(text, x, y, width, height, active_color, inactive_color, text_color=b
             if text == 'Normal':
                 game_start(2)
             else:
-                if 'Frantic' != text != 'Hard':
+                if 'Frantic' != text:
                     game_start(1, text.lower())
 
     else:
@@ -129,7 +120,7 @@ def collision(player1, player2, ball, player1_vel, player2_vel):
     ball.coll_detect_player(player1.x, player1.y, player2.x, player2.y, player1_vel, player2_vel)
 
 
-def key_getter_game2player(player1, player2, y_vel):
+def key_getter_game2player(player1, player2, player_vel):
 
     p2_actions = 0
     p1_actions = 0
@@ -143,22 +134,22 @@ def key_getter_game2player(player1, player2, y_vel):
                 homeScreen()
 
             if event.key == pygame.K_SPACE:
-                key_getter()
+                pause()
 
             if event.key == pygame.K_UP and p2_actions == 0:
-                player2.vel = -y_vel
+                player2.vel = -player_vel
                 p2_actions = 1
 
             elif event.key == pygame.K_DOWN and p2_actions == 0:
-                player2.vel = y_vel
+                player2.vel = player_vel
                 p2_actions = 1
 
             elif event.key == pygame.K_w and p1_actions == 0:
-                player1.vel = -y_vel
+                player1.vel = -player_vel
                 p1_actions = 1
 
             elif event.key == pygame.K_s and p1_actions == 0:
-                player1.vel = y_vel
+                player1.vel = player_vel
                 p1_actions = 1
 
         if event.type == pygame.KEYUP:
@@ -184,7 +175,7 @@ def key_getter_game2player(player1, player2, y_vel):
                 player1.vel = 0
 
 
-def restart(player1, player2, ball):
+def restart(player1, player2, ball, scorer=''):
     player2.x = display_width - player_width * 2
     player2.y = display_height / 2 - player_height / 2
 
@@ -193,12 +184,20 @@ def restart(player1, player2, ball):
 
     ball.x = display_width // 2
     ball.y = display_height // 2
-    ball.yVel = ball.starty_vel
 
-    ball.xVel = ball.startx_vel
+    if random.randint(0, 1) == 1:
+        ball.yVel = ball.starty_vel
+
+    else:
+        ball.yVel = -ball.starty_vel
+
+    if scorer == 'player2':
+        ball.xVel = -ball.startx_vel
+    elif scorer == 'player1':
+        ball.xVel = ball.startx_vel
 
 
-def key_getter():
+def pause():
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -219,7 +218,7 @@ def win_player(winner, players, difficulty=''):
     message_to_screen('Space to play again Q to quit', white, -50, size='small')
     pygame.display.update()
 
-    key_getter()
+    pause()
 
     if players == 2:
         game_start(2)
@@ -259,7 +258,12 @@ def game_start(players, difficulty=''):
     if players == 2:
         game_loop_2player(player1, player2, ball)
     else:
-        game_loop_1player(player1, player2, ball, difficulty)
+        if difficulty == 'easy':
+            game_loop_1player(player1, player2, ball, easy)
+        elif difficulty == 'medium':
+            game_loop_1player(player1, player2, ball, medium)
+        else:
+            game_loop_1player(player1, player2, ball, hard)
 
 
 def game_loop_2player(player1, player2, ball):
@@ -278,9 +282,10 @@ def game_loop_2player(player1, player2, ball):
 
         player1.move()
         player2.move()
-        ball.move()
 
         collision(player1, player2, ball, player1.vel, player2.vel)
+
+        ball.move()
 
         draw_window(ball, player1, player2)
 
@@ -289,8 +294,11 @@ def game_loop_2player(player1, player2, ball):
         if over:
             if ball.xVel > 0:
                 player1.score += 1
+                restart(player1, player2, ball, "player1")
+
             else:
                 player2.score += 1
+                restart(player1, player2, ball, "player2")
 
             if player1.score == 5 or player2.score == 5:
 
@@ -306,7 +314,6 @@ def game_loop_2player(player1, player2, ball):
                     player2.score = 0
                     win_player('PLAYER2', 2)
 
-            restart(player1, player2, ball)
             game_loop_2player(player1, player2, ball)
 
 
@@ -347,7 +354,54 @@ def medium(player2, ball, player_speed):
             player2.move()
 
 
-def key_getter_game_1player(player1, y_vel):
+def hard(player2, ball, player_speed):
+
+    if ball.xVel > 0:
+
+        if ball.yVel > player_speed:
+            if player2.y / 2.2 < ball.y and player2.x - ball.x > 60:
+                player2.vel = player_speed
+                player2.move()
+
+            else:
+                if player2.y + player_height / 2 > ball.y:
+                    player2.vel = -player_speed
+
+                elif player2.y + player_height / 2 < ball.y:
+                    player2.vel = player_speed
+
+        elif ball.yVel < -player_speed:
+            if player2.y + player_height * 2.2 > ball.y and player2.x - ball.x > 60:
+                player2.vel = -player_speed
+                player2.move()
+
+            else:
+                if player2.y + player_height / 2 > ball.y:
+                    player2.vel = -player_speed
+
+                elif player2.y + player_height / 2 < ball.y:
+                    player2.vel = player_speed
+
+        else:
+            if player2.y + player_height / 2 > ball.y:
+                player2.vel = -player_speed
+                player2.move()
+
+            elif player2.y + player_height / 2 < ball.y:
+                player2.vel = player_speed
+                player2.move()
+
+    else:
+        if player2.y + player_height / 2 > display_height / 2:
+            player2.vel = -player_speed
+            player2.move()
+
+        elif player2.y + player_height / 2 < display_height / 2:
+            player2.vel = player_speed
+            player2.move()
+
+
+def key_getter_game_1player(player1, player_vel):
 
     p1_actions = 0
     for event in pygame.event.get():
@@ -360,14 +414,14 @@ def key_getter_game_1player(player1, y_vel):
                 homeScreen()
 
             if event.key == pygame.K_SPACE:
-                key_getter()
+                pause()
 
             elif event.key == pygame.K_w or event.key == pygame.K_UP and p1_actions == 0:
-                player1.vel = -y_vel
+                player1.vel = -player_vel
                 p1_actions = 1
 
             elif event.key == pygame.K_s or event.key == pygame.K_DOWN and p1_actions == 0:
-                player1.vel = y_vel
+                player1.vel = player_vel
                 p1_actions = 1
 
         if event.type == pygame.KEYUP:
@@ -387,8 +441,6 @@ def game_loop_1player(player1, player2, ball, difficulty):
 
     player_speed = 10
 
-    restart(player1, player2, ball)
-
     draw_window(ball, player1, player2)
 
     pygame.time.wait(500)
@@ -396,12 +448,13 @@ def game_loop_1player(player1, player2, ball, difficulty):
     run = True
     while run:
         FPS.tick(20)
+
         key_getter_game_1player(player1, player_speed)
-        medium(player2, ball, player_speed)
+        difficulty(player2, ball, player_speed)
+        player1.move()
 
         collision(player1, player2, ball, player1.vel, player2.vel)
 
-        player1.move()
         ball.move()
 
         draw_window(ball, player1, player2)
@@ -411,8 +464,10 @@ def game_loop_1player(player1, player2, ball, difficulty):
         if over:
             if ball.xVel > 0:
                 player1.score += 1
+                restart(player1, player2, ball, "player1")
             else:
                 player2.score += 1
+                restart(player1, player2, ball, "player2")
 
             if player1.score == 5 or player2.score == 5:
 
