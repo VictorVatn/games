@@ -1,32 +1,104 @@
 from pong.classes import *
 FPS = pygame.time.Clock()
 
+easy_coordinates = (30, 270, 100, 50)
+easyX = easy_coordinates[0]
+easyY = easy_coordinates[1]
+easy_width = easy_coordinates[2]
+easy_height = easy_coordinates[3]
+
+medium_coordinates = (150, 270, 100, 50)
+mediumX = medium_coordinates[0]
+mediumY = medium_coordinates[1]
+medium_width = medium_coordinates[2]
+medium_height = medium_coordinates[3]
+
+hard_coordinates = (270, 270, 100, 50)
+hardX = hard_coordinates[0]
+hardY = hard_coordinates[1]
+hard_width = hard_coordinates[2]
+hard_height = hard_coordinates[3]
+
+normal_coordinates = (680, 270, 100, 50)
+normalX = normal_coordinates[0]
+normalY = normal_coordinates[1]
+normal_width = normal_coordinates[2]
+normal_height = normal_coordinates[3]
+
+frantic_coordinates = (830, 270, 100, 50)
+franticX = frantic_coordinates[0]
+franticY = frantic_coordinates[1]
+frantic_width = frantic_coordinates[2]
+frantic_height = frantic_coordinates[3]
+
 
 def homeScreen():
 
     gameDisplay.fill(black)
-    message_to_screen('Welcome to my first game without any help', white, 50, size='med')
-    message_to_screen("If you're by yourself press 1 but if you have someone to play with press 2", white, size='small')
-    message_to_screen("While in game press Space to pause and Q to quit", white, -40, size='small')
+    message_to_screen('Pong', red, 110, size='large')
+    message_to_screen("SinglePlayer", white, 100, 300, size='med')
+    message_to_screen("TwoPlayer", white, 100, -300, size='med')
+
     pygame.display.update()
 
     intro = True
     while intro:
+
+        button("Easy", easyX, easyY, easy_width, easy_height, light_green, green)
+        button("Medium", mediumX, mediumY, medium_width, medium_height, light_yellow, yellow)
+        button("Hard", hardX, hardY, hard_width, hard_height, light_red, red)
+
+        button("Normal", normalX, normalY, normal_width, normal_height, light_green, green)
+        button("Frantic", franticX, franticY, frantic_width, frantic_height, light_red, red)
+
+        pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_1:
                     intro = False
-                    game_start_1player("easy")
+                    game_start(1, "medium")
 
                 elif event.key == pygame.K_2:
                     intro = False
-                    game_start_2player()
+                    game_start(2)
 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
         FPS.tick(15)
+
+
+def text_to_button(msg, color, buttonx, buttony, button_width, button_height):
+    textSurf, textRect = text_objects(msg, color, "small")
+    textRect.center = ((buttonx + button_width / 2),  buttony + button_height / 2)
+    gameDisplay.blit(textSurf, textRect)
+
+
+def button(text, x, y, width, height, active_color, inactive_color, text_color=black):
+    mouse_pos = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+
+    if x + width >= mouse_pos[0] >= x and y + height >= mouse_pos[1] >= y:
+        pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
+        if click[0] == 1:
+            if text == 'Normal':
+                game_start(2)
+            else:
+                if 'Frantic' != text != 'Hard':
+                    game_start(1, text.lower())
+
+    else:
+        pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
+
+    text_to_button(text, text_color, x, y, width, height)
+
+
+def message_to_screen(message, color, y_displace=0, x_displace=0, size="small"):
+    textSurf, textRect = text_objects(message, color, size)
+    textRect.center = display_width // 2 - x_displace, display_height // 2 - y_displace
+    gameDisplay.blit(textSurf, textRect)
 
 
 def draw_window(ball, p1, p2):
@@ -38,12 +110,6 @@ def draw_window(ball, p1, p2):
     p1.draw(gameDisplay)
     p2.draw(gameDisplay)
     pygame.display.update()
-
-
-def message_to_screen(message, color, y_displace=0, x_displace=0, size="small"):
-    textSurf, textRect = text_objects(message, color, size)
-    textRect.center = display_width // 2 - x_displace, display_height // 2 - y_displace
-    gameDisplay.blit(textSurf, textRect)
 
 
 def text_objects(text, color, size):
@@ -63,7 +129,7 @@ def collision(player1, player2, ball, player1_vel, player2_vel):
     ball.coll_detect_player(player1.x, player1.y, player2.x, player2.y, player1_vel, player2_vel)
 
 
-def key_getter_game(player1, player2, y_vel):
+def key_getter_game2player(player1, player2, y_vel):
 
     p2_actions = 0
     p1_actions = 0
@@ -117,8 +183,6 @@ def key_getter_game(player1, player2, y_vel):
                     player1.move()
                 player1.vel = 0
 
-    return player1.vel, player2.vel
-
 
 def restart(player1, player2, ball):
     player2.x = display_width - player_width * 2
@@ -129,9 +193,9 @@ def restart(player1, player2, ball):
 
     ball.x = display_width // 2
     ball.y = display_height // 2
-    ball.yvel = ball.starty_vel
+    ball.yVel = ball.starty_vel
 
-    ball.xvel = ball.startx_vel
+    ball.xVel = ball.startx_vel
 
 
 def key_getter():
@@ -149,7 +213,7 @@ def key_getter():
         FPS.tick(15)
 
 
-def win_2player(winner):
+def win_player(winner, players, difficulty=''):
 
     message_to_screen(winner + ' WINS!', white, 20, size='large')
     message_to_screen('Space to play again Q to quit', white, -50, size='small')
@@ -157,10 +221,14 @@ def win_2player(winner):
 
     key_getter()
 
-    game_start_2player()
+    if players == 2:
+        game_start(2)
+
+    else:
+        game_start(1, difficulty)
 
 
-def game_start_2player():
+def game_start(players, difficulty=''):
     player1 = Player(player_width,
                      display_height / 2 - player_height / 2,
                      red,
@@ -187,7 +255,11 @@ def game_start_2player():
         display_height,
         player_width,
         player_height)
-    game_loop_2player(player1, player2, ball)
+
+    if players == 2:
+        game_loop_2player(player1, player2, ball)
+    else:
+        game_loop_1player(player1, player2, ball, difficulty)
 
 
 def game_loop_2player(player1, player2, ball):
@@ -202,7 +274,7 @@ def game_loop_2player(player1, player2, ball):
     while run:
         FPS.tick(20)
 
-        player1.vel, player2.vel = key_getter_game(player1, player2, player_speed)
+        key_getter_game2player(player1, player2, player_speed)
 
         player1.move()
         player2.move()
@@ -215,7 +287,7 @@ def game_loop_2player(player1, player2, ball):
         over = ball.win_loss()
 
         if over:
-            if ball.xvel > 0:
+            if ball.xVel > 0:
                 player1.score += 1
             else:
                 player2.score += 1
@@ -227,12 +299,12 @@ def game_loop_2player(player1, player2, ball):
                 if player1.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_2player('PLAYER1')
+                    win_player('PLAYER1', 2)
 
                 elif player2.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_2player('PLAYER2')
+                    win_player('PLAYER2', 2)
 
             restart(player1, player2, ball)
             game_loop_2player(player1, player2, ball)
@@ -241,26 +313,38 @@ def game_loop_2player(player1, player2, ball):
 # One player version functions only from here onwards
 
 def easy(player2, ball, player_speed):
-    if player2.y + player_height // 2 > ball.y and ball.xvel > 0:
+    if player2.y + player_height // 2 > ball.y and ball.xVel > 0:
         player2.vel = -player_speed
         player2.move()
 
-    elif player2.y + player_height // 2 < ball.y and ball.xvel > 0:
+    elif player2.y + player_height // 2 < ball.y and ball.xVel > 0:
         player2.vel = player_speed
         player2.move()
 
     else:
         player2.vel = 0
 
-def win_1player(winner):
 
-    message_to_screen(winner + 'WINS!', white, 20, size='large')
-    message_to_screen('Space to play again Q to quit', white, -50, size='small')
-    pygame.display.update()
+def medium(player2, ball, player_speed):
 
-    key_getter()
+    if ball.xVel > 0:
 
-    game_start_1player("easy")
+        if player2.y + player_height // 2 > ball.y:
+            player2.vel = -player_speed
+            player2.move()
+
+        elif player2.y + player_height // 2 < ball.y:
+            player2.vel = player_speed
+            player2.move()
+
+    else:
+        if player2.y + player_height / 2 > display_height / 2:
+            player2.vel = -player_speed
+            player2.move()
+
+        elif player2.y + player_height / 2 < display_height / 2:
+            player2.vel = player_speed
+            player2.move()
 
 
 def key_getter_game_1player(player1, y_vel):
@@ -297,57 +381,23 @@ def key_getter_game_1player(player1, y_vel):
                 if p1_actions == 1:
                     player1.move()
                 player1.vel = 0
-    return player1.vel
-
-
-def game_start_1player(difficulties):
-    difficulty = 0
-
-    player1 = Player(player_width,
-                     display_height / 2 - player_height / 2,
-                     red,
-                     player_width,
-                     player_height,
-                     display_height,
-                     0)
-
-    player2 = Player(display_width -
-                     player_width * 2,
-                     display_height / 2 - player_height / 2,
-                     red,
-                     player_width,
-                     player_height,
-                     display_height,
-                     0)
-
-    ball = Ball(display_width // 2 + ball_size // 2,
-                display_height // 2 + ball_size // 2,
-                blue,
-                ball_size,
-                display_width,
-                display_height,
-                player_width,
-                player_height)
-
-    if difficulties == 'easy':
-        difficulty = easy
-
-    game_loop_1player(player1, player2, ball, difficulty)
 
 
 def game_loop_1player(player1, player2, ball, difficulty):
 
     player_speed = 10
 
+    restart(player1, player2, ball)
+
     draw_window(ball, player1, player2)
 
     pygame.time.wait(500)
-    run = True
 
+    run = True
     while run:
         FPS.tick(20)
-        player1.vel = key_getter_game_1player(player1, player_speed)
-        difficulty(player2, ball, player_speed)
+        key_getter_game_1player(player1, player_speed)
+        medium(player2, ball, player_speed)
 
         collision(player1, player2, ball, player1.vel, player2.vel)
 
@@ -359,7 +409,7 @@ def game_loop_1player(player1, player2, ball, difficulty):
         over = ball.win_loss()
 
         if over:
-            if ball.xvel > 0:
+            if ball.xVel > 0:
                 player1.score += 1
             else:
                 player2.score += 1
@@ -371,12 +421,11 @@ def game_loop_1player(player1, player2, ball, difficulty):
                 if player1.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_1player('PLAYER1')
+                    win_player('PLAYER1', 1, difficulty)
 
                 elif player2.score == 5:
                     player1.score = 0
                     player2.score = 0
-                    win_1player('CPU')
+                    win_player('CPU', 1, difficulty)
 
-            restart(player1, player2, ball)
             game_loop_1player(player1, player2, ball, difficulty)
