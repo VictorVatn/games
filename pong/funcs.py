@@ -1,4 +1,4 @@
-from classes import *
+from pong.classes import *
 
 FPS = pygame.time.Clock()
 
@@ -245,11 +245,7 @@ def win_player(winner, players, difficulty=''):
 
     pause()
 
-    if players == 2:
-        game_start(2)
-
-    else:
-        game_start(1, difficulty)
+    game_start(players, difficulty)
 
 
 def game_start(players, difficulty=''):
