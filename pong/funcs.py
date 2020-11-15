@@ -1,4 +1,4 @@
-from pong.classes import *
+from classes import *
 
 FPS = pygame.time.Clock()
 
